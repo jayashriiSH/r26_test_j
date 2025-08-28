@@ -41,12 +41,12 @@ MotionCommand Odometry::computeCommands(vector<pair<int, int>> &path) {
   res.angle_deg += fmod((prev_angle + 360), 360);  // ensure positive angle
 
   for (size_t i = 0; i < path.size() - 1; i++) {
-    // Distance and time
+    // distance
     double d = distance(path[i].first, path[i].second,
                         path[i+1].first, path[i+1].second);
     res.time_sec += d / linear_vel;
 
-    // Turning angles
+    // turning angle
     if (i + 2 < path.size()) {
       double next_angle = angle(path[i+1].first, path[i+1].second,
                                 path[i+2].first, path[i+2].second);
@@ -58,7 +58,7 @@ MotionCommand Odometry::computeCommands(vector<pair<int, int>> &path) {
       res.angle_deg += dtheta;
       prev_angle = next_angle;
     }
-  }
-  
+}
+
   return res;
 }
