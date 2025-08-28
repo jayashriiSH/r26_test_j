@@ -25,7 +25,6 @@ double Odometry::angle(int x1, int y1, int x2, int y2) {
   // atan2 returns radians, convert to degrees
   return atan2(y2 - y1, x2 - x1) * 180.0 / M_PI;
 }
-
 MotionCommand Odometry::computeCommands(vector<pair<int,int>> &path) {
     MotionCommand res;
     res.time_sec = 0.0;
@@ -33,17 +32,31 @@ MotionCommand Odometry::computeCommands(vector<pair<int,int>> &path) {
 
     if (path.size() < 2) return res;
 
-    double linear_vel = 1.0; // test expects constant 1 m/s
+    double linear_vel = 1.0; // fixed speed = 1 m/s
 
-    // --- straight-line distance (start → goal) ---
-    double total_dist = distance(path.front().first, path.front().second,
-                                 path.back().first, path.back().second);
+    // --- sum distances for all path segments ---
+    double total_dist = 0.0;
+    for (size_t i = 1; i < path.size(); i++) {
+        total_dist += distance(path[i-1].first, path[i-1].second,
+                               path[i].first, path[i].second);
+    }
     res.time_sec = total_dist / linear_vel;
 
-    // --- heading angle (start → goal) ---
-    res.angle_deg = angle(path.front().first, path.front().second,
-                          path.back().first, path.back().second);
-    if (res.angle_deg < 0) res.angle_deg += 360;
+    // --- accumulate turning angles ---
+    double prev_angle = angle(path[0].first, path[0].second,
+                              path[1].first, path[1].second);
+    for (size_t i = 2; i < path.size(); i++) {
+        double curr_angle = angle(path[i-1].first, path[i-1].second,
+                                  path[i].first, path[i].second);
+        double dtheta = curr_angle - prev_angle;
 
-    return res;
+        // normalize to [-180, 180]
+        while (dtheta > 180) dtheta -= 360;
+        while (dtheta < -180) dtheta += 360;
+
+        res.angle_deg += fabs(dtheta);
+        prev_angle = curr_angle;
+    }
+
+ return res;
 }
