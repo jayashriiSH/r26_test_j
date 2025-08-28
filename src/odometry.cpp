@@ -32,9 +32,9 @@ MotionCommand Odometry::computeCommands(vector<pair<int,int>> &path) {
 
     if (path.size() < 2) return res;
 
-    double linear_vel = 1.0; // fixed speed = 1 m/s
+    double linear_vel = 1.0; // constant speed
 
-    // --- sum distances for all path segments ---
+    // --- compute total Euclidean distance ---
     double total_dist = 0.0;
     for (size_t i = 1; i < path.size(); i++) {
         total_dist += distance(path[i-1].first, path[i-1].second,
@@ -42,9 +42,10 @@ MotionCommand Odometry::computeCommands(vector<pair<int,int>> &path) {
     }
     res.time_sec = total_dist / linear_vel;
 
-    // --- accumulate turning angles ---
+    // --- compute total turning angle ---
     double prev_angle = angle(path[0].first, path[0].second,
                               path[1].first, path[1].second);
+
     for (size_t i = 2; i < path.size(); i++) {
         double curr_angle = angle(path[i-1].first, path[i-1].second,
                                   path[i].first, path[i].second);
@@ -58,5 +59,5 @@ MotionCommand Odometry::computeCommands(vector<pair<int,int>> &path) {
         prev_angle = curr_angle;
     }
 
- return res;
+    return res;
 }
