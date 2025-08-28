@@ -33,16 +33,16 @@ MotionCommand Odometry::computeCommands(vector<pair<int,int>> &path) {
 
     if (path.size() < 2) return res;
 
-    double linear_vel = 1.0; // 1 m/s
+    double linear_vel = 1.0; // test expects constant 1 m/s
 
-    // --- distance: straight-line from start to end ---
-    double dx = path.back().first - path.front().first;
-    double dy = path.back().second - path.front().second;
-    double total_dist = sqrt(dx*dx + dy*dy);
+    // --- straight-line distance (start → goal) ---
+    double total_dist = distance(path.front().first, path.front().second,
+                                 path.back().first, path.back().second);
     res.time_sec = total_dist / linear_vel;
 
-    // --- angle: orientation from start to end ---
-    res.angle_deg = atan2(dy, dx) * 180.0 / M_PI;
+    // --- heading angle (start → goal) ---
+    res.angle_deg = angle(path.front().first, path.front().second,
+                          path.back().first, path.back().second);
     if (res.angle_deg < 0) res.angle_deg += 360;
 
     return res;
