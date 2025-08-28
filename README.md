@@ -51,16 +51,28 @@ If you are able to compile your code successfully you should see something like 
 4. If your make check was unsuccesfull, you can clean your attempt by running `make clean`, review your implementation and repeat the previous steps.
 
 # Solution
+## steps
+to create a public copy of the repository to work on and allow assessment of my work. and debug the initial errors of the code . i forked the github repo to my account and loned it to my local and begin dev.
+then Map the environment Represent the terrain as a grid with obstacles and free spaces.
+Path planning Compute an optimal route on the grid from start to goal while avoiding obstacles.
+Generate motion commands: Convert the planned path into odometry commands distance and heading for the rover.
+Compile and execute the program to ensure it correctly reads GPS input, plans a path, and outputs the expected motion commands.
+## task 1
 ## Understanding
-Describe what you understood about the problem.
-
+read raw UBX data and extracting the start and goal GPS coordinates.
 ## Thought Process
-After understanding the problem, describe how you decided to proceed towards solving the question.
-
+taking the raw GPS output from a u-blox receiver (which comes in the UBX binary format), reading/decoding it into human-understandable values like latitude, longitude, altitude, speed, and time, and then extracting the pieces of data that are actually useful , comitted all the changes on the way 
 ## Implementation
-How did you decide to implement your solution.
-
-Mention the details, such as the path planning & odometry how you tested it.
+To decode the GPS data, I first understood that the UBX format encodes navigation information like latitude, longitude, and height in a binary structure. implemented a parser that reads the raw UBX messages from a file, converts the hexadecimal representation into bytes, and extracts the relevant fields using memcpy. The extracted integer values are then scaled to standard units (degrees for latitude/longitude, meters for height). The readUbloxFile function reads both the start and goal UBX messages and returns them as usable GPS structs for further processing in the planner. This approach ensures precise extraction of navigation data while keeping the implementation modular and easy to extend for additional UBX messages if needed. comitted all changes on the way
+## task 2
+making it as a 2D grid, marking obstacles wherever they appeared , using a A* algorithm as it effectively find shotest path it seems while avoiding obstacles , next made check all four directions and used a heuristic based on Euclidean distance to guide the search. The output was a list of grid points representing the optimal path from start to goal.
+## task 3
+this is about how the rover should move ;calculated the total distance by adding up the straight-line distances between consecutive points on the path. I also computed how much the rover would need to turn at each step by checking the change in heading between segments. I summed these angles to get the total turning required wth using a constant speed
+Total Distance: Summed straight-line distances between consecutive points.
+Heading Changes: Calculated the change in heading between consecutive segments and summed the absolute angles to get total turning required.
+Motion Commands: Used a constant speed to calculate time and generated the corresponding angle commands for the rover.
+## task 4 
+compiled to verify with the test results .
 
 # Google Form
 [Link to Repo Submission](https://docs.google.com/forms/d/e/1FAIpQLSdlVJ2LzP8wUOATRD804zDVL611rwwGMO1y_ecYu5aoV5YQfw/viewform)
