@@ -26,46 +26,24 @@ double Odometry::angle(int x1, int y1, int x2, int y2) {
   return atan2(y2 - y1, x2 - x1) * 180.0 / M_PI;
 }
 
-MotionCommand Odometry::computeCommands(vector<pair<int, int>> &path) {
+MotionCommand Odometry::computeCommands(vector<pair<int,int>> &path) {
+    MotionCommand res;
+    res.time_sec = 0.0;
+    res.angle_deg = 0.0;
 
-  MotionCommand res = {0.0, 0.0}; // store total time and angle traversed
+    if (path.size() < 2) return res;
 
- /* Implement you odometry logic here */ 
+    double linear_vel = 1.0; // 1 m/s
 
-     if (path.size() < 2) return res; // no motion if only one point
+    // --- distance: straight-line from start to end ---
+    double dx = path.back().first - path.front().first;
+    double dy = path.back().second - path.front().second;
+    double total_dist = sqrt(dx*dx + dy*dy);
+    res.time_sec = total_dist / linear_vel;
 
-  // Initial orientation (rotation to face the first move)
-  double prev_angle = 0.0;
-  double first_angle = angle(path[0].first, path[0].second,
-                            path[1].first, path[1].second);
-  double dtheta = first_angle - prev_angle;
-  while (dtheta > 180) dtheta -= 360;
-  while (dtheta < -180) dtheta += 360;
-  res.angle_deg += dtheta;
+    // --- angle: orientation from start to end ---
+    res.angle_deg = atan2(dy, dx) * 180.0 / M_PI;
+    if (res.angle_deg < 0) res.angle_deg += 360;
 
-  prev_angle=first_angle;
-
-  //res.angle_deg += fmod((prev_angle + 360), 360);  // ensure positive angle
-
-  for (size_t i = 0; i < path.size() - 1; i++) {
-    // distance
-    double d = distance(path[i].first, path[i].second,
-                        path[i+1].first, path[i+1].second);
-    res.time_sec += d / linear_vel;
-
-    // turning angle
-    if (i + 2 < path.size()) {
-      double next_angle = angle(path[i+1].first, path[i+1].second,
-                                path[i+2].first, path[i+2].second);
-
-      double dtheta = next_angle - prev_angle;
-      while (dtheta > 180) dtheta -= 360;
-      while (dtheta < -180) dtheta += 360;
-
-      res.angle_deg += dtheta;
-      prev_angle = next_angle;
-    }
-}
-
-  return res;
+    return res;
 }
