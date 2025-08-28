@@ -3,6 +3,8 @@
 #include <ctime>
 #include <iterator>
 #include <numeric>
+#define M_PI 3.14
+
 
 using namespace std;
 
