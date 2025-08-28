@@ -38,7 +38,7 @@ MotionCommand Odometry::computeCommands(vector<pair<int, int>> &path) {
   double prev_angle = angle(path[0].first, path[0].second,
                             path[1].first, path[1].second);
 
-  res.angle_deg += fmod((prev_angle + 360), 360);  // ensure positive angle
+  //res.angle_deg += fmod((prev_angle + 360), 360);  // ensure positive angle
 
   for (size_t i = 0; i < path.size() - 1; i++) {
     // distance
