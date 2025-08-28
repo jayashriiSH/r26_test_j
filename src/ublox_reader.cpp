@@ -9,14 +9,16 @@
 
 using namespace std;
 
+/* This extracts fields like time, longitude, latitude, height 
+   from the UBX binary buffer into a gps struct. */
 static int NAV_POSLLH(uint8_t *buffer, classId *gps) {
-  memcpy(&gps->iTOW, buffer, 4);
-  memcpy(&gps->lon, buffer, 4);
-  memcpy(&gps->lat, buffer, 4);
-  memcpy(&gps->height, buffer + 12, 4);
-  memcpy(&gps->hMSL, buffer + 16, 4);
-  memcpy(&gps->hAcc, buffer + 20, 4);
-  memcpy(&gps->vAcc, buffer + 24, 4);
+  memcpy(&gps->iTOW,   buffer,      4);  // time of week
+  memcpy(&gps->lon,    buffer + 4,  4);  // longitude
+  memcpy(&gps->lat,    buffer + 8,  4);  // latitude
+  memcpy(&gps->height, buffer + 12, 4);  // height above ellipsoid
+  memcpy(&gps->hMSL,   buffer + 16, 4);  // height above mean sea level
+  memcpy(&gps->hAcc,   buffer + 20, 4);  // horizontal accuracy
+  memcpy(&gps->vAcc,   buffer + 24, 4);  // vertical accuracy
   return 0;
 }
 
@@ -32,8 +34,8 @@ static vector<uint8_t> hexToBytes(const string &rawHex) {
 
 int decodeUBX(uint8_t *buffer, classId *gps) {
   // buffer points at class field
-  if (buffer[30] == 0x01 && buffer[32] == 0x02) { // Class = NAV, ID = POSLLH
-    return NAV_POSLLH(buffer + 4, gps);         // skip length
+  if (buffer[0] == 0x01 && buffer[1] == 0x02) { // NAV, POSLLH
+    return NAV_POSLLH(buffer + 4, gps);         // skip length (2 bytes)
   }
   return 1;
 }
