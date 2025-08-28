@@ -35,8 +35,15 @@ MotionCommand Odometry::computeCommands(vector<pair<int, int>> &path) {
      if (path.size() < 2) return res; // no motion if only one point
 
   // Initial orientation (rotation to face the first move)
-  double prev_angle = angle(path[0].first, path[0].second,
+  double prev_angle = 0.0;
+  double first_angle = angle(path[0].first, path[0].second,
                             path[1].first, path[1].second);
+  double dtheta = first_angle - prev_angle;
+  while (dtheta > 180) dtheta -= 360;
+  while (dtheta < -180) dtheta += 360;
+  res.angle_deg += dtheta;
+
+  prev_angle=first_angle;
 
   //res.angle_deg += fmod((prev_angle + 360), 360);  // ensure positive angle
 
